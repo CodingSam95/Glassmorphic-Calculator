@@ -1,4 +1,5 @@
 :root {
+:root {
     --bg-color: #0b0d11;
     --glass-bg: rgba(255, 255, 255, 0.05);
     --green-glow: rgba(32, 227, 178, 0.6);
@@ -24,7 +25,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Use dvh (dynamic viewport height) so browser chrome is excluded on mobile */
     height: 100dvh;
     width: 100vw;
     overflow: hidden;
@@ -33,7 +33,6 @@ body {
 .calculator {
     width: 100%;
     max-width: 420px;
-    /* Fill the full dynamic viewport height */
     height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -43,7 +42,6 @@ body {
 }
 
 .display {
-    /* Shrink if needed but maintain minimum presence */
     flex: 1 1 auto;
     min-height: 0;
     display: flex;
@@ -78,32 +76,50 @@ body {
     min-height: 1.4rem;
 }
 
+/*
+ * SIZE STRATEGY: The grid owns the button size via --btn-size.
+ * Buttons get explicit width AND height from this variable, so they
+ * are always a perfect square — border-radius:50% then makes them circles.
+ *
+ * --btn-size = min(
+ *   width leg:  fit 4 buttons + 3 gaps inside the padded container width
+ *   height leg: fit 5 rows + 4 gaps inside the remaining viewport height
+ * )
+ *
+ * "160px" is an estimate for display area + top/bottom padding.
+ * Adjust if you change display padding significantly.
+ */
 .grid {
+    --gap: clamp(8px, 2vw, 14px);
+    --btn-size: min(
+        calc((min(100vw, 420px) - 32px - 3 * var(--gap)) / 4),
+        calc((100dvh - 160px - 4 * var(--gap)) / 5)
+    );
+
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    /* Responsive gap: shrinks on very short screens */
-    gap: clamp(6px, 2vh, 14px);
-    /* Never shrink — buttons must stay visible */
+    grid-template-columns: repeat(4, var(--btn-size));
+    gap: var(--gap);
     flex-shrink: 0;
+    justify-content: center;
 }
 
 .btn {
-    /* Use min() so buttons never overflow on very small screens */
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    /* Cap max size so buttons don't get huge on tablets */
-    max-height: min(18vw, 90px);
+    /* Explicit equal width AND height — guarantees a perfect square */
+    width: var(--btn-size);
+    height: var(--btn-size);
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.03);
     background: var(--glass-bg);
     color: var(--text-main);
-    font-size: clamp(1.1rem, 5vw, 1.5rem);
+    /* Font scales with button size so it never overflows the circle */
+    font-size: calc(var(--btn-size) * 0.36);
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: transform 0.1s;
     outline: none;
+    flex-shrink: 0;
 }
 
 .btn.number {
@@ -266,33 +282,4 @@ body {
 
 .error-text {
     color: #ff4d4d !important;
-}
-
-/* ── Short-screen safety net ────────────────────────────────────────────
-   On very compact phones (e.g. SE, small Androids) shrink gaps further
-   and let the display area compress so the grid always stays visible.   */
-@media (max-height: 680px) {
-    .calculator {
-        padding: 6px 12px;
-        padding-bottom: max(env(safe-area-inset-bottom, 8px), 8px);
-    }
-
-    .display {
-        padding: 4px 6px;
-    }
-
-    .grid {
-        gap: clamp(4px, 1.5vh, 10px);
-    }
-}
-
-@media (max-height: 520px) {
-    .grid {
-        gap: 4px;
-    }
-
-    .btn {
-        max-height: 14vw;
-        font-size: clamp(0.9rem, 4vw, 1.2rem);
-    }
 }
