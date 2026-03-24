@@ -24,36 +24,38 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    /* Use dvh (dynamic viewport height) so browser chrome is excluded on mobile */
+    height: 100dvh;
     width: 100vw;
     overflow: hidden;
-    /* Stops the whole screen from scrolling */
 }
 
 .calculator {
     width: 100%;
     max-width: 420px;
-    height: 100%;
+    /* Fill the full dynamic viewport height */
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    /* Bottom padding to account for phone home bars */
-    padding-bottom: env(safe-area-inset-bottom, 30px);
+    padding: 12px 16px;
+    padding-bottom: max(env(safe-area-inset-bottom, 12px), 12px);
+    overflow: hidden;
 }
 
 .display {
-    flex: 1;
-    /* Takes only the REMAINING space */
+    /* Shrink if needed but maintain minimum presence */
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-end;
-    padding: 20px 10px;
+    padding: 10px 6px;
     overflow: hidden;
 }
 
 #decimal-out {
-    font-size: clamp(2.5rem, 12vw, 4rem);
+    font-size: clamp(2rem, 10vw, 4rem);
     color: var(--text-main);
     font-weight: normal;
     text-align: right;
@@ -71,27 +73,31 @@ body {
 }
 
 #fraction-out {
-    font-size: 1.1rem;
+    font-size: clamp(0.85rem, 3vw, 1.1rem);
     color: var(--text-dim);
-    min-height: 1.5rem;
+    min-height: 1.4rem;
 }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    /* Reduced gap to ensure it fits on smaller screens */
-    gap: 12px;
-    /* This ensures the grid is never squished or pushed out */
+    /* Responsive gap: shrinks on very short screens */
+    gap: clamp(6px, 2vh, 14px);
+    /* Never shrink — buttons must stay visible */
     flex-shrink: 0;
 }
 
 .btn {
-    aspect-ratio: 1/1;
+    /* Use min() so buttons never overflow on very small screens */
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    /* Cap max size so buttons don't get huge on tablets */
+    max-height: min(18vw, 90px);
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.03);
     background: var(--glass-bg);
     color: var(--text-main);
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 5vw, 1.5rem);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -111,7 +117,6 @@ body {
     box-shadow:
         var(--prox-glow, inset 0 0 0 transparent, inset 0 0 0 transparent),
         inset 0 0 0 transparent,
-        /* Inner glow placeholder */
         inset 0px 1.5px 2px hsla(0, 0%, 100%, 0.3),
         inset 0px -2px 4px hsla(0, 0%, 0%, 0.35),
         0px 4px 12px hsla(0, 0%, 0%, 0.35);
@@ -119,13 +124,11 @@ body {
     transition: transform 0.1s, box-shadow 1.2s ease-out;
 }
 
-/* Base physics for all buttons */
 .btn:active {
     transform: translateY(2px) scale(0.98);
     transition: none !important;
 }
 
-/* THE GLOW EFFECT & PHYSICS */
 .btn.number:active,
 .btn.number.tapped {
     box-shadow:
@@ -135,8 +138,6 @@ body {
         inset 0px -2px 4px hsla(0, 0%, 0%, 0.35),
         0px 4px 12px hsla(0, 0%, 0%, 0.35);
 }
-
-/* Remove the !important transition override to use JS-controlled transitions like outer glow */
 
 .btn.operator {
     color: #8a90ff;
@@ -151,7 +152,6 @@ body {
     box-shadow:
         var(--prox-glow, inset 0 0 0 transparent, inset 0 0 0 transparent),
         inset 0 0 0 transparent,
-        /* Inner glow placeholder */
         inset 0px 2px 4px rgba(138, 144, 255, 0.3),
         inset 0px -3px 6px hsla(0, 0%, 0%, 0.4),
         0px 5px 14px hsla(0, 0%, 0%, 0.35);
@@ -167,8 +167,6 @@ body {
         inset 0px -3px 6px hsla(0, 0%, 0%, 0.4),
         0px 5px 14px hsla(0, 0%, 0%, 0.35);
 }
-
-/* Standardized transition for operators */
 
 .btn.action {
     color: #5c6bc0;
@@ -204,7 +202,6 @@ body {
     box-shadow:
         var(--prox-glow, inset 0 0 0 transparent, inset 0 0 0 transparent),
         inset 0 0 0 transparent,
-        /* Inner glow placeholder */
         inset 0px 2px 4px rgba(32, 227, 178, 0.3),
         inset 0px -3px 6px hsla(0, 0%, 0%, 0.4),
         0px 5px 14px hsla(0, 0%, 0%, 0.35);
@@ -221,8 +218,6 @@ body {
         0px 5px 14px hsla(0, 0%, 0%, 0.35);
 }
 
-/* Standardized transition for percent */
-
 .btn.ce {
     color: #ff4d4d;
     --glow-color: var(--red-glow);
@@ -236,7 +231,6 @@ body {
     box-shadow:
         var(--prox-glow, inset 0 0 0 transparent, inset 0 0 0 transparent),
         inset 0 0 0 transparent,
-        /* Inner glow placeholder */
         inset 0px 2px 4px rgba(255, 77, 77, 0.3),
         inset 0px -3px 6px hsla(0, 0%, 0%, 0.4),
         0px 5px 14px hsla(0, 0%, 0%, 0.35);
@@ -252,8 +246,6 @@ body {
         inset 0px -3px 6px hsla(0, 0%, 0%, 0.4),
         0px 5px 14px hsla(0, 0%, 0%, 0.35);
 }
-
-/* Standardized transition for CE */
 
 .btn.equal {
     background: linear-gradient(145deg, #20e3b2, #0ba360);
@@ -272,7 +264,35 @@ body {
         0px 2px 5px hsla(0, 0%, 0%, 0.35);
 }
 
-/* Error glow effect */
 .error-text {
     color: #ff4d4d !important;
+}
+
+/* ── Short-screen safety net ────────────────────────────────────────────
+   On very compact phones (e.g. SE, small Androids) shrink gaps further
+   and let the display area compress so the grid always stays visible.   */
+@media (max-height: 680px) {
+    .calculator {
+        padding: 6px 12px;
+        padding-bottom: max(env(safe-area-inset-bottom, 8px), 8px);
+    }
+
+    .display {
+        padding: 4px 6px;
+    }
+
+    .grid {
+        gap: clamp(4px, 1.5vh, 10px);
+    }
+}
+
+@media (max-height: 520px) {
+    .grid {
+        gap: 4px;
+    }
+
+    .btn {
+        max-height: 14vw;
+        font-size: clamp(0.9rem, 4vw, 1.2rem);
+    }
 }
