@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Glass Glow Calculator</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
+        rel="stylesheet">
+    <link rel='stylesheet'
+        href='https://cdn-uicons.flaticon.com/4.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+</head>
+
+<body>
+    <div class="ambient-mesh">
+        <div class="blob green"></div>
+        <div class="blob blue"></div>
+        <div class="blob red"></div>
+    </div>
+
+    <div class="calculator">
+
+        <div class="top-bar">
+            <fieldset class="switcher" aria-label="Choose mode">
+                <legend class="switcher__legend">Choose mode</legend>
+                <label class="switcher__option">
+                    <input class="switcher__input" type="radio" name="calc-mode" value="general" c-option="1" checked />
+                    <i class="switcher__icon fi fi-rr-calculator-simple"></i>
+                </label>
+                <label class="switcher__option">
+                    <input class="switcher__input" type="radio" name="calc-mode" value="scientific" c-option="2" />
+                    <i class="switcher__icon fi fi-rr-function"></i>
+                </label>
+                <div class="switcher__filter">
+                    <svg width="0" height="0" style="position:absolute">
+                        <filter id="switcher-filter" primitiveUnits="objectBoundingBox">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="0.04" result="blur" />
+                        </filter>
+                    </svg>
+                </div>
+            </fieldset>
+
+            <div class="top-bar-right">
+                <button id="btn-constants" class="constants-icon-btn" aria-label="Scientific constants">
+                    <i class="fi fi-rr-physics"></i>
+                </button>
+
+                <button id="btn-history" class="history-icon-btn" aria-label="Calculation history">
+                    <i class="fi fi-rr-time-past"></i>
+                </button>
+
+                <div id="constants-panel" class="constants-panel">
+                    <div class="constants-panel-header">
+                        <span class="constants-title">Scientific Constants</span>
+                    </div>
+                    <div class="constants-list">
+                        <div class="const-row" onclick="injectConstant('299792458', 'c')">
+                            <span class="const-sym">c</span>
+                            <span class="const-info">
+                                <span class="const-name">Speed of Light</span>
+                                <span class="const-val">299,792,458 m/s</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('6.6743e-11', 'G')">
+                            <span class="const-sym">G</span>
+                            <span class="const-info">
+                                <span class="const-name">Gravitational Constant</span>
+                                <span class="const-val">6.6743 × 10⁻¹¹ N·m²/kg²</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('6.6261e-34', 'h')">
+                            <span class="const-sym">h</span>
+                            <span class="const-info">
+                                <span class="const-name">Planck Constant</span>
+                                <span class="const-val">6.6261 × 10⁻³⁴ J·s</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('1.3806e-23', 'k')">
+                            <span class="const-sym">k</span>
+                            <span class="const-info">
+                                <span class="const-name">Boltzmann Constant</span>
+                                <span class="const-val">1.3806 × 10⁻²³ J/K</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('6.022e23', 'Nᴀ')">
+                            <span class="const-sym">Nᴀ</span>
+                            <span class="const-info">
+                                <span class="const-name">Avogadro Number</span>
+                                <span class="const-val">6.022 × 10²³ mol⁻¹</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('8.3145', 'R')">
+                            <span class="const-sym">R</span>
+                            <span class="const-info">
+                                <span class="const-name">Universal Gas Constant</span>
+                                <span class="const-val">8.3145 J/mol·K</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('5.6704e-8', 'σ')">
+                            <span class="const-sym">σ</span>
+                            <span class="const-info">
+                                <span class="const-name">Stefan-Boltzmann Const.</span>
+                                <span class="const-val">5.6704 × 10⁻⁸ W/m²·K⁴</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('10973731.57', 'Rʜ')">
+                            <span class="const-sym">Rʜ</span>
+                            <span class="const-info">
+                                <span class="const-name">Rydberg Constant</span>
+                                <span class="const-val">10,973,731.57 m⁻¹</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('96485', 'F')">
+                            <span class="const-sym">F</span>
+                            <span class="const-info">
+                                <span class="const-name">Faraday Constant</span>
+                                <span class="const-val">96,485 C/mol</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('8.8542e-12', 'ε₀')">
+                            <span class="const-sym">ε₀</span>
+                            <span class="const-info">
+                                <span class="const-name">Permittivity of Vacuum</span>
+                                <span class="const-val">8.8542 × 10⁻¹² m⁻³·kg⁻¹·s⁴·A²</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('1.2566e-6', 'μ₀')">
+                            <span class="const-sym">μ₀</span>
+                            <span class="const-info">
+                                <span class="const-name">Permeability of Vacuum</span>
+                                <span class="const-val">1.2566 × 10⁻⁶ m·kg·s⁻²·A⁻²</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('1.6022e-19', 'e')">
+                            <span class="const-sym">e</span>
+                            <span class="const-info">
+                                <span class="const-name">Elementary Charge</span>
+                                <span class="const-val">1.6022 × 10⁻¹⁹ C</span>
+                            </span>
+                        </div>
+                        <div class="const-row" onclick="injectConstant('1.6180339887', 'φ')">
+                            <span class="const-sym">φ</span>
+                            <span class="const-info">
+                                <span class="const-name">Golden Ratio</span>
+                                <span class="const-val">1.6180339887</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="history-panel" class="history-panel">
+                    <div class="history-panel-header">
+                        <span class="history-title">History</span>
+                        <button id="btn-clear-history" class="clear-history-btn" aria-label="Clear history">
+                            <i class="fi fi-rr-trash"></i>
+                        </button>
+                    </div>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="display">
+            <div id="expr-out"></div>
+            <div id="decimal-out">0</div>
+            <div id="live-preview"></div>
+            <div id="fraction-out"></div>
+        </div>
+
+        <div class="grid" id="main-grid">
+
+            <!-- ── SCIENTIFIC ROWS (hidden by default) ── -->
+            <div class="sci-rows" id="sci-rows">
+                <!-- Row S1: sin cos tan nCr deg/rad -->
+                <button class="btn sci" onclick="sciFunc('sin')">sin</button>
+                <button class="btn sci" onclick="sciFunc('cos')">cos</button>
+                <button class="btn sci" onclick="sciFunc('tan')">tan</button>
+                <button class="btn sci" onclick="sciFunc('nCr')">nCr</button>
+                <button class="btn sci deg-rad" id="btn-deg-rad" onclick="toggleDegRad()">deg</button>
+
+                <!-- Row S2: log ln sqrt cbrt inv -->
+                <button class="btn sci" onclick="sciFunc('log')">log</button>
+                <button class="btn sci" onclick="sciFunc('ln')">ln</button>
+                <button class="btn sci" onclick="sciFunc('sqrt')"><i class="fi fi-rr-square-root"></i></button>
+                <button class="btn sci btn-cbrt" onclick="sciFunc('cbrt')"><span class="cbrt-icon">³√</span></button>
+                <button class="btn sci inv" onclick="toggleInv()">inv</button>
+
+                <button class="btn sci fact" onclick="sciFunc('fact')">!</button>
+            </div>
+
+            <button class="btn action ac" onclick="clearAll()">AC</button>
+            <button id="btn-parentheses" class="btn number" onclick="handleParentheses()">( )</button>
+            <button id="btn-ce" class="btn action ce"><i class="fi fi-rr-delete"></i></button>
+            <button class="btn operator" onclick="append('/')">÷</button>
+
+            <button class="btn sci pow" id="btn-pow" onclick="sciFunc('pow')">^</button>
+            <button class="btn number" onclick="append('7')">7</button>
+            <button class="btn number" onclick="append('8')">8</button>
+            <button class="btn number" onclick="append('9')">9</button>
+            <button class="btn operator" onclick="append('*')">×</button>
+
+            <!-- Row 5: π 4 5 6 − -->
+            <button class="btn sci pi" id="btn-pi" onclick="sciFunc('pi')">π</button>
+            <button class="btn number" onclick="append('4')">4</button>
+            <button class="btn number" onclick="append('5')">5</button>
+            <button class="btn number" onclick="append('6')">6</button>
+            <button class="btn operator" onclick="append('-')">-</button>
+
+            <!-- Row 6: e 1 2 3 + -->
+            <button class="btn sci euler" id="btn-e" onclick="sciFunc('e')">e</button>
+            <button class="btn number" onclick="append('1')">1</button>
+            <button class="btn number" onclick="append('2')">2</button>
+            <button class="btn number" onclick="append('3')">3</button>
+            <button class="btn operator" onclick="append('+')">+</button>
+
+            <!-- Row 7: 00 0 . % = -->
+            <button class="btn number zero0" id="btn-00" onclick="append('00')">00</button>
+            <button class="btn number" onclick="append('0')">0</button>
+            <button class="btn number" onclick="append('.')">.</button>
+            <button class="btn action percent" onclick="append('%')">%</button>
+            <button class="btn equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
